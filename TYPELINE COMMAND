@@ -1,0 +1,30 @@
+void typeline(char *option, char *filename) {
+    FILE *fp = fopen(filename, "r");
+    char line[100];
+    int count = 0, n;
+    
+    if(fp == NULL) {
+        printf("File not found\n");
+        return;
+    }
+    
+    if(strcmp(option, "+n") == 0) {
+        n = atoi(args[2]); // Get n from command
+        while(fgets(line, sizeof(line), fp) && count < n) {
+            printf("%s", line);
+            count++;
+        }
+    }
+    else if(strcmp(option, "-a") == 0) {
+        while(fgets(line, sizeof(line), fp)) {
+            printf("%s", line);
+        }
+    }
+    fclose(fp);
+}
+
+// In main shell, add:
+if(strcmp(args[0], "typeline") == 0) {
+    typeline(args[1], args[2]);
+    continue; // Skip fork-exec for custom command
+}

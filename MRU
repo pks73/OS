@@ -1,0 +1,87 @@
+#include<stdio.h>
+
+int main() {
+    int n, frames;
+    
+    printf("Enter number of pages: ");
+    scanf("%d", &n);
+    
+    int ref[n];
+    printf("Enter reference string: ");
+    for(int i=0; i<n; i++) {
+        scanf("%d", &ref[i]);
+    }
+    
+    printf("Enter number of frames: ");
+    scanf("%d", &frames);
+    
+    int mem[frames];
+    int recent[frames];
+    
+    for(int i=0; i<frames; i++) {
+        mem[i] = -1;
+        recent[i] = -1;
+    }
+    
+    int page_faults = 0;
+    
+    printf("\nPage Replacement Process:\n");
+    
+    for(int i=0; i<n; i++) {
+        int page = ref[i];
+        
+        printf("Page %d: ", page);
+        
+        int found = 0;
+        for(int j=0; j<frames; j++) {
+            if(mem[j] == page) {
+                found = 1;
+                recent[j] = i;
+                printf("Hit\t\t");
+                break;
+            }
+        }
+        
+        if(!found) {
+            page_faults++;
+            
+            int empty_slot = -1;
+            for(int j=0; j<frames; j++) {
+                if(mem[j] == -1) {
+                    empty_slot = j;
+                    break;
+                }
+            }
+            
+            if(empty_slot != -1) {
+                mem[empty_slot] = page;
+                recent[empty_slot] = i;
+            } else {
+                int mru_index = 0;
+                for(int j=1; j<frames; j++) {
+                    if(recent[j] > recent[mru_index]) {
+                        mru_index = j;
+                    }
+                }
+                
+                mem[mru_index] = page;
+                recent[mru_index] = i;
+            }
+            
+            printf("X\t");
+        }
+        
+        for(int j=0; j<frames; j++) {
+            if(mem[j] != -1) {
+                printf("%d ", mem[j]);
+            } else {
+                printf("- ");
+            }
+        }
+        printf("\n");
+    }
+    
+    printf("\nTotal Page Faults: %d\n", page_faults);
+    
+    return 0;
+}

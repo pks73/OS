@@ -1,0 +1,75 @@
+#include<stdio.h>
+#include<fcntl.h>
+#include<sys/stat.h>
+#include<sys/types.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<string.h>
+void make_toks(char *s, char *tok[]){
+    int i=0;
+    char *p;
+    p=strtok(s," ");
+    while(p!=NULL){
+tok[i++]=p;
+p=strtok(NULL," ");
+
+    }
+    tok[i++]=NULL;
+}
+void count(char op,char *fn)
+{
+    int fp,cc=0,wc=0,lc=0;
+    char c;
+    fp=open(fn,O_RDONLY);
+    if(fp==-1)
+    {
+        printf("File %s not found",fn);
+        return;
+    }
+    while(read(fp,&c,1)>0)
+    { if(c==' ')
+        wc++;
+        else if(c=='\n')
+        {
+            lc++; wc++;
+
+        }
+        cc++;
+    }
+    switch(op){
+        case 'c': printf("No of characters=%d\n",cc);
+        break;
+        case 'w': printf("No of words=%d\n",wc);
+        break;
+        case 'l': printf("No of lines=%d\n",lc);
+        break;
+    }
+}
+void main()
+{
+    char buff[80],*args[10];
+    int pid;
+    while(1)
+    {
+        printf("myshell$ ");
+        fgets(buff,80,stdin);
+        buff[strlen(buff)-1]='\0';
+        make_toks(buff,args);
+        if(strcmp(args[0],"exit")==0)
+        exit(0);
+        pid=fork();
+        if(pid==0)
+        {
+            if(strcmp(args[0],"count")==0)
+            count(args[2][0],args[1]);
+            else
+            {
+                printf("Invalid command\n");
+                exit(0);
+            }
+            exit(0);
+        }
+        else
+        wait(NULL);
+    }
+}

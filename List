@@ -1,0 +1,81 @@
+#include<sys/types.h>
+#include<unistd.h>
+#include<sys/stat.h>
+#include<stdlib.h>
+#include<stdio.h>
+#include<fcntl.h>
+#include<string.h>
+#include<dirent.h>
+void make_toks(char *s , char *tok[])
+{
+    int i=0;
+    char *p;
+    p=strtok(s," ");
+    while(p!=NULL)
+    {
+        tok[i++]=p;
+        p=strtok(NULL," ");
+    }
+    tok[i]=NULL;
+    }
+
+void list(char *dn,char op)
+{
+    DIR *dp;
+    struct dirent *e;
+    int dc=0,fc=0;
+    dp=opendir(dn);
+    if(dp==NULL)
+    {
+        printf("Dir %s not found",dn);
+        return;
+    }
+    switch(op){
+        case 'f': while(e=readdir(dp))
+        {
+            if(e->d_type==DT_REG)
+            printf("%s\n",e->d_name);
+
+        }
+        break;
+        case 'n': while(e=readdir(dp))
+        {
+            if(e->d_type==DT_REG) fc++;
+            if(e->d_type==DT_DIR) dc++;
+         
+
+        }
+        printf("dirs =%d\n files=%d\n",dc,fc);
+        break;
+
+    }
+}
+void main()
+{
+    char buff[80],*args[10];
+    int pid;
+    while(1)
+    {
+        printf("myshell$ ");
+        fflush(stdin);
+        fgets(buff,80,stdin);
+        buff[strlen(buff)-1]='\0';
+        make_toks(buff,args);
+        if(strcmp(args[0],"list")==0)
+        list(args[2],args[1][0]);
+    else
+    {
+        pid=fork();
+        if(pid>0)
+        {
+            wait(NULL);
+
+        }
+        else
+        {
+            if(execvp(args[0],args)==-1)
+            printf("Bad command");
+        }
+    }
+    }
+}

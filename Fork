@@ -1,0 +1,31 @@
+
+#include<stdio.h>
+#include<sys/types.h>
+#include<unistd.h>
+void ChildProcess();
+void ParentProcess();
+int main()
+{
+pid_t pid;
+pid=fork();
+if(pid==0)
+ChildProcess();
+else
+ParentProcess();
+return 0;
+}
+void ChildProcess()
+{
+int p;
+printf("I am child process..\n");
+
+printf("ID=%d\n",getpid());
+}
+void ParentProcess()
+{
+int c;
+printf("I am parent process..\n");
+
+printf("ID=%d\n",getppid());
+}
+

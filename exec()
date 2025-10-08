@@ -1,0 +1,42 @@
+main.c
+
+#include<stdio.h>
+#include<unistd.h>
+#include<stdlib.h>
+#include<sys/wait.h>
+
+int main() {
+    pid_t pid;
+    char *args[] = {"./child", "Hello", "World", NULL};
+    
+    printf("Parent Process: PID = %d\n", getpid());
+    
+    pid = fork();
+    
+    if(pid == 0) {
+        printf("Child Process: Executing new program...\n");
+        execvp(args[0], args);
+        printf("This won't print if exec is successful\n");
+    }
+    else {
+        wait(NULL);
+        printf("Parent: Child process completed\n");
+    }
+    
+    return 0;
+}
+-----------------------------------------------------------------------------------------
+child.c
+
+#include<stdio.h>
+
+int main(int argc, char *argv[]) {
+    printf("Child Process: PID = %d\n", getpid());
+    printf("Arguments received:\n");
+    
+    for(int i=0; i<argc; i++) {
+        printf("argv[%d] = %s\n", i, argv[i]);
+    }
+    
+    return 0;
+}

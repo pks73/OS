@@ -1,0 +1,98 @@
+#include<stdio.h>
+
+int main() {
+    int n, frames;
+    
+    printf("Enter number of pages: ");
+    scanf("%d", &n);
+    
+    int ref[n];
+    printf("Enter reference string: ");
+    for(int i=0; i<n; i++) {
+        scanf("%d", &ref[i]);
+    }
+    
+    printf("Enter number of frames: ");
+    scanf("%d", &frames);
+    
+    int mem[frames];
+    int freq[frames];
+    int time[frames];
+    
+    for(int i=0; i<frames; i++) {
+        mem[i] = -1;
+        freq[i] = 0;
+        time[i] = 0;
+    }
+    
+    int page_faults = 0;
+    int current_time = 0;
+    
+    printf("\nPage Replacement Process:\n");
+    
+    for(int i=0; i<n; i++) {
+        int page = ref[i];
+        current_time++;
+        
+        printf("Page %d: ", page);
+        
+        int found = 0;
+        for(int j=0; j<frames; j++) {
+            if(mem[j] == page) {
+                found = 1;
+                freq[j]++;
+                time[j] = current_time;
+                printf("Hit\t\t");
+                break;
+            }
+        }
+        
+        if(!found) {
+            page_faults++;
+            
+            int empty_slot = -1;
+            for(int j=0; j<frames; j++) {
+                if(mem[j] == -1) {
+                    empty_slot = j;
+                    break;
+                }
+            }
+            
+            if(empty_slot != -1) {
+                mem[empty_slot] = page;
+                freq[empty_slot] = 1;
+                time[empty_slot] = current_time;
+            } else {
+                int lfu_index = 0;
+                for(int j=1; j<frames; j++) {
+                    if(freq[j] < freq[lfu_index]) {
+                        lfu_index = j;
+                    } else if(freq[j] == freq[lfu_index]) {
+                        if(time[j] < time[lfu_index]) {
+                            lfu_index = j;
+                        }
+                    }
+                }
+                
+                mem[lfu_index] = page;
+                freq[lfu_index] = 1;
+                time[lfu_index] = current_time;
+            }
+            
+            printf("Page Fault\t");
+        }
+        
+        for(int j=0; j<frames; j++) {
+            if(mem[j] != -1) {
+                printf("%d(%d) ", mem[j], freq[j]);
+            } else {
+                printf("- ");
+            }
+        }
+        printf("\n");
+    }
+    
+    printf("\nTotal Page Faults: %d\n", page_faults);
+    
+    return 0;
+}
